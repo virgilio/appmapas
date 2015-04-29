@@ -69,23 +69,58 @@ angular.module('starter.controllers', [])
 
 }])
 
-.controller('EventsCtrl', function($scope, Events) {
+.controller('EventsCtrl', function($scope, Events, $ionicPopover) {
+    $scope.busy = true;
     $scope.location = {
         la: -23.5623921705055,
         lo: -46.6550525229797
     }
 
-    $scope.places = Events.places($scope.location, new Date());
+    $scope.places = {};
+    $scope.eventCount = 0;
+    $scope.placeEvents = {};
 
-    $scope.eventCount = Events.count($scope.location, new Date());
+    Events.places($scope.location, new Date())
+        .then(function(places){
+            $scope.places = places;
+            $scope.places.forEach(function(place){
+                Events.place_data(place.id)
+                    .then(function(data){
+                        place.more = data;
+                    });
+            });
+            console.log($scope.places);
+            return places;
+        },
+        function(data){
+            console.log(data);
+            return null;
+        });
 
-    $scope.getPlaceData = function (placeId){
-        return Events.placeData(placeId);
-    }
-
+    Events.count($scope.location, new Date())
+        .then(function(data){
+            $scope.eventCount = data;
+        });
+    
     $scope.getPlaceEvents = function(placeId){
         return Events.placeEvents(placeId);
     }
+
+     $ionicPopover.fromTemplateUrl('my-popover.html', {
+         scope: $scope
+     }).then(function(popover) {
+         $scope.popover = popover;
+     });
+
+     $scope.openPopover = function($event, $index) {
+         Events.place_events($index, new Date())
+             .then(function(data){
+                 $scope.place_events = data;
+             }, function(data){
+                 console.log("Err: ", data);
+             });
+         $scope.popover.show($event);
+     };
 })
 
 .controller('AccountCtrl', function($scope) {

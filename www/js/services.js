@@ -10,7 +10,7 @@ angular.module('starter.services', [])
         },
         query: {
             COUNTBYLOCATION: "/findByLocation/?@count=1&@from={0}&@to={1}&_geoLocation=GEONEAR({2},{3},{4})",
-            FINDPLACES: "/findByEvents/?@from={0}&@to={1}&@select=id,name,location&@order=name%20ASC&_geoLocation=GEONEAR({2},{3},{4})",
+            FINDPLACES: "/findByEvents/?@from={0}&@to={1}&@select=id,name,location,description&@order=name%20ASC&_geoLocation=GEONEAR({2},{3},{4})",
             FINDONE: "/findOne/?&id=EQ({0})&@select=id,singleUrl,name,subTitle,type,shortDescription,terms,project.name,project.singleUrl,endereco,endereco,acessibilidade&@files=(avatar.avatarSmall):url",
             FINDBYPLACE: "/findBySpace/?@from={0}&@to={1}&@select=id,singleUrl,name,subTitle,type,shortDescription,terms,project.name,project.singleUrl,endereco,classificacaoEtaria&@order=name%20ASC&spaceId={2}&@files=(avatar.avatarSmall):url"        
         },
@@ -21,30 +21,27 @@ angular.module('starter.services', [])
                 .success(function (data, status, headers, config){
                 })
             .error(function(data, status, headers,config){
-                // TODO create error handling
                 console.log(status);
-                console.log(data);
-                console.log(config);
-                console.log(headers);
+                // TODO create error handling
+            }).then(function(data){
+                return data.data;
             });
         },
-        findPlaces: function(location, span){
-            var query = api.url + api.entity.PLACE + api.query.FINDPLACES;
-            the_query = this.format(query, span.from, span.to, location.lo, location.la, 1500);
-            $http.get(the_query)
-                .success(function (data, status, headers, config){ 
-                    return data;
+        find_places: function(location, span){
+            var query = API + api.entity.PLACE + api.query.FINDPLACES;
+            var the_query = this.format(query, span.from, span.to, location.lo, location.la, 1500);
+            return $http.get(the_query)
+                .success(function (data, status, headers, config){
                 })
             .error(function(data, status, headers,config){
+                console.log(status)
                 // TODO  create error handling
-                console.log(status);
-                console.log(data);
-                console.log(config);
-                console.log(headers);
+            }).then(function(data){
+                return data.data;
             });
 
         },
-        findPlaceData: function(){
+        find_place_data: function(place_id){
             // TODO run find 
             var query = API + api.entity.PLACE  + api.query.FINDONE;
             var the_query = this.format(query, place_id);
@@ -59,7 +56,7 @@ angular.module('starter.services', [])
                 return data.data;
             });
         },
-        findEventsFromPlace: function(){
+        find_events_from_place: function(place_id, span){
             // TODO find space events
             var query = API + api.entity.EVENT + api.query.FINDBYPLACE;
             var the_query = this.format(query, span.from, span.to, place_id);
@@ -82,11 +79,11 @@ angular.module('starter.services', [])
                     ;
             });
         },
-        monthSpan: function(date){
+        month_span: function(date){
             // TODO better way to format date
             from = date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate();
             to = date.getFullYear() + "-" + (date.getMonth()+2) + "-" + date.getDate();
-            return [from, to];
+            return {from: from, to: to};
         }
     };
 
@@ -95,19 +92,19 @@ angular.module('starter.services', [])
          * Count all places nearby *location* in the day *date*
          **/
         count: function(location, date) {
-            return api.count(location, api.monthSpan(date));
+            return api.count(location, api.month_span(date));
         },
         /** 
          * Get all places the have events nearby *location* in the day *date*
          **/
         places: function(location, date) {
-            return api.findPlaces(location, api.monthSpan(date));
+            return api.find_places(location, api.month_span(date));
         },
-        placeData: function(placeId){
-            return null;
+        place_data: function(place_id){
+            return api.find_place_data(place_id);
         },
-        placeEvents: function(placeId){
-            return null;
+        place_events: function(place_id, date){
+            return api.find_events_from_place(place_id, api.month_span(date));
         }
     };
 });
