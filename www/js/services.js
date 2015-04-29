@@ -1,10 +1,9 @@
 angular.module('starter.services', [])
 
-.factory('Events', function($http) {
+.factory('Events', function($http, API) {
     // TODO Refactor, move this to a better place 
     // (READ http://github/hacklabr/mapasculturais)
     var api = {
-        url: "http://spcultura.prefeitura.sp.gov.br/api",
         entity: {
             EVENT: "/event",
             PLACE: "/space",
@@ -16,11 +15,10 @@ angular.module('starter.services', [])
             FINDBYPLACE: "/findBySpace/?@from={0}&@to={1}&@select=id,singleUrl,name,subTitle,type,shortDescription,terms,project.name,project.singleUrl,endereco,classificacaoEtaria&@order=name%20ASC&spaceId={2}&@files=(avatar.avatarSmall):url"        
         },
         count: function (location, span){
-            query = api.url + api.entity.EVENT + api.query.COUNTBYLOCATION;
-            the_query = this.format(query, span.from, span.to, location.lo, location.la, 1500);
-            $http.get(the_query)
-                .success(function (data, status, headers, config){ 
-                    return data;
+            var query = API + api.entity.EVENT + api.query.COUNTBYLOCATION;
+            var the_query = this.format(query, span.from, span.to, location.lo, location.la, 1500);
+            return $http.get(the_query)
+                .success(function (data, status, headers, config){
                 })
             .error(function(data, status, headers,config){
                 // TODO create error handling
@@ -48,9 +46,32 @@ angular.module('starter.services', [])
         },
         findPlaceData: function(){
             // TODO run find 
+            var query = API + api.entity.PLACE  + api.query.FINDONE;
+            var the_query = this.format(query, place_id);
+            console.log(the_query);
+            return $http.get(the_query)
+                .success(function (data, status, headers, config){
+                })
+            .error(function(data, status, headers,config){
+                console.log(status);
+                // TODO create error handling
+            }).then(function(data){
+                return data.data;
+            });
         },
         findEventsFromPlace: function(){
             // TODO find space events
+            var query = API + api.entity.EVENT + api.query.FINDBYPLACE;
+            var the_query = this.format(query, span.from, span.to, place_id);
+            return $http.get(the_query)
+                .success(function (data, status, headers, config){
+                })
+            .error(function(data, status, headers,config){
+                console.log(status);
+                // TODO create error handling
+            }).then(function(data){
+                return data.data;
+            });
         },
         format: function (format) {
             var args = Array.prototype.slice.call(arguments, 1);

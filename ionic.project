@@ -1,4 +1,10 @@
 {
-  "name": "Mapas Culturais",
-  "app_id": ""
+    "name": "Mapas Culturais",
+    "app_id": "",
+
+    "proxies": [
+        {
+            "path": "/api",
+            "proxyUrl": "http://spcultura.prefeitura.sp.gov.br/api"
+        }]
 }
