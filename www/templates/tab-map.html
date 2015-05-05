@@ -1,7 +1,7 @@
 <ion-view view-title="Mapa de eventos">
 <ion-nav-view></ion-nav-view>
 <ion-content scroll="false">
-    <div class="row">
+    <!--<div class="row">
         <div id="search-box" class="col">
             <div class="card item-input-inset" style="padding: 0 !important; margin: 0;">
                 <label class="item-input-wrapper">
@@ -13,15 +13,22 @@
                 </button>
             </div>
         </div>
+    </div>-->
+    <div class="" style="height: 98%">
+    <ion-scroll class="col col-33" style="float: left; padding-top: 0; height: 98%;" direction="y">
+    <h4>{{ place.name }}</h4>
+    <h5>{{ place.description }}</h5>
+    <div class="list list-inset">
+        <label class="item item-input">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input ng-model="place.search.data" ng-change="filter_place_data()" type="text" placeholder="Filtrar eventos">
+        </label>
     </div>
-    <div class="" style="height: 95%">
-    <ion-scroll class="col col-33" style="float: left; padding-top: 0; height: 94%;" direction="y">
-        <h4>Eventos próximos</h4>
-        <ul class="list card" style="margin-top: 0;">
-            <li ng-repeat="event in place_events" class="item">
-            {{ event.name }}
-            </li>
-        </ul>
+    <ul class="list card" style="margin-top: 0;">
+        <li ng-repeat="event in place.results" class="item">
+        {{ event.name }}
+        </li>
+    </ul>
     </ion-scroll>
     <div class="col col-67" id="map_canvas" style="height:94%; border: 1px solid #eee; display: block; float: right;">
     </div>
@@ -36,7 +43,7 @@
         </ion-header-bar>
         <ion-content>
             <ul>
-                <li ng-repeat="event in place_events">
+                <li ng-repeat="event in place.results">
                     {{ event.name }}
                 </li>
             </ul>

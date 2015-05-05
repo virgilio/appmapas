@@ -1,7 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('MapCtrl', ['$scope', 'Events', '$ionicPopover', function($scope,
-            Events, $ionicPopover) {
+.controller('MapCtrl', ['$scope', 'Events', '$ionicPopover', '$timeout', function($scope, Events, $ionicPopover, $timeout) {
     var map;
     var SAO_PAULO;
     var options;
@@ -63,6 +62,9 @@ angular.module('starter.controllers', [])
         $scope.places = {};
         $scope.markers = {};
         $scope.location = {};
+        $scope.place = {};
+        $scope.place.name = "Selecione um espaço";
+        $scope.place.description = "...";
 
         $scope.getPlaceEvents = function(placeId){
             return Events.placeEvents(placeId);
@@ -74,21 +76,22 @@ angular.module('starter.controllers', [])
         function showPlaceData(){
             Events.places($scope.location, new Date())
                 .then(function(places){
-                    $scope.places = places;
-                    $scope.places.forEach(function(place){
+                    places.forEach(function(place){
+                        $scope.places[place.id] = place;
                         var curr_position = new plugin.google.maps.LatLng(
                                 place.location.latitude,
                                 place.location.longitude);
                         var options = {
                             'position' : curr_position,
+                            'title' : place.name
                         }
 
                         map.addMarker(options, function(marker){
-                            $scope.markers[$scope.markers.length] = marker;
+                            $scope.markers[place.id] = marker;
                             marker.addEventListener(
                                     plugin.google.maps.event.MARKER_CLICK,
                                     function(){
-                                        marker.hideInfoWindow();
+                                        //marker.hideInfoWindow();
                                         map.setClickable( false );
                                         get_place_events(place.id);
                                     });
@@ -97,6 +100,10 @@ angular.module('starter.controllers', [])
                         Events.place_data(place.id)
                             .then(function(data){
                                 place.more = data;
+                                var marker = $scope.markers[place.id];
+                                marker
+                                    .setSnippet(place.more.shortDescription
+                                            .substring(0, 50));
                             });
                     });
 
@@ -120,7 +127,13 @@ angular.module('starter.controllers', [])
         function get_place_events($index) {
             Events.place_events($index, new Date())
                 .then(function(data){
-                    $scope.place_events = data;
+                    $scope.place.events = data;
+                    $scope.place.results = data;
+                    $scope.place.id = $index;
+
+                    var place = $scope.places[$index];
+                    $scope.place.description = place.more.shortDescription;
+                    $scope.place.name = place.name;
                 }, function(data){
                     console.log("Err: ", data);
                 });
@@ -130,20 +143,10 @@ angular.module('starter.controllers', [])
         // Filtering options
         $scope.search = {};
         $scope.search.data = '';
-        $scope.filter_place_data = function(){
-            if($scope.search.data.length > 3){
-                var results = [];
-                console.log($scope.places.length);
-                for(var i = 0; i < $scope.places.length; i++) {
-                    var chunk = JSON.stringify($scope.places[i]);
-                    if(chunk.indexOf($scope.search.data) != -1) {
-                        results.push($scope.places[i]);
-                    }
-                }
-                console.log(JSON.stringify(results));
-            }
-        }
 
+        $scope.filter_place_data = function(){
+
+        };
     });
 }])
 
@@ -193,7 +196,7 @@ angular.module('starter.controllers', [])
     $scope.openPopover = function($event, $index) {
         Events.place_events($index, new Date())
             .then(function(data){
-                $scope.place_events = data;
+                $scope.place.events = data;
             }, function(data){
                 console.log("Err: ", data);
             });
