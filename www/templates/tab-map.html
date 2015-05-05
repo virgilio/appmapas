@@ -1,13 +1,45 @@
 <ion-view view-title="Mapa de eventos">
-<ion-content scroll="false" class="padding">
-    <div id="map_canvas" style="width:100%; height:100%;">
-        <label class="item-input-wrapper">
-            <i class="icon ion-ios-search placeholder-icon"></i>
-            <input type="search" placeholder="Search">
-        </label>
-        <button class="button button-clear">
-            Buscar
-        </button>
+<ion-nav-view></ion-nav-view>
+<ion-content scroll="false">
+    <div class="row">
+        <div id="search-box" class="col">
+            <div class="card item-input-inset" style="padding: 0 !important; margin: 0;">
+                <label class="item-input-wrapper">
+                    <i class="icon ion-ios-search placeholder-icon"></i>
+                    <input ng-model="search.data" type="text" placeholder="Search">
+                </label>
+                <button ng-click="filter_place_data()" class="button button-clear">
+                    Buscar
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="" style="height: 95%">
+    <ion-scroll class="col col-33" style="float: left; padding-top: 0; height: 94%;" direction="y">
+        <h4>Eventos próximos</h4>
+        <ul class="list card" style="margin-top: 0;">
+            <li ng-repeat="event in place_events" class="item">
+            {{ event.name }}
+            </li>
+        </ul>
+    </ion-scroll>
+    <div class="col col-67" id="map_canvas" style="height:94%; border: 1px solid #eee; display: block; float: right;">
+    </div>
     </div>
 </ion-content>
 </ion-view>
+
+<script id="place-events.html" type="text/ng-template">
+    <ion-popover-view class="card">
+        <ion-header-bar>
+            <h1 class="title">My Popover Title</h1>
+        </ion-header-bar>
+        <ion-content>
+            <ul>
+                <li ng-repeat="event in place_events">
+                    {{ event.name }}
+                </li>
+            </ul>
+        </ion-content>
+    </ion-popover-view>
+</script>
